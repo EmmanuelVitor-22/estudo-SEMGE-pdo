@@ -1,0 +1,15 @@
+{
+  "name": "emmanuelvitor/estudo-semge-pdo",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "emmanuelvitor",
+      "email": "emmanuelvitor.ti@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+        "Emmanuel\\": "src/"
+    }
+  }
+}
