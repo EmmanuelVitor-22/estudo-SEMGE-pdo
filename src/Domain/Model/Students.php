@@ -45,6 +45,11 @@ class Students
         $this->birthDate = $birthDate;
     }
 
+    public function age(): int
+    {
+        return $this->birthDate->diff(new \DateTimeImmutable())->y;
+
+    }
 
 
 }
