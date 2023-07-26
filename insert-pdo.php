@@ -1,10 +1,11 @@
 <?php
 
 use Emmanuel\Domain\Model\Students;
+use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
 
 require 'vendor/autoload.php';
 
-$pdo = new \Emmanuel\Infrastructure\Persistence\ConnectionCreator::createConnection();
+$pdo = ConnectionCreator::createConnection();
 $student = new Students(null,"Tour",new DateTimeImmutable("2000-12-06"));
 // forma simples de inserir
 //$sqlInsert = "INSERT INTO students (name, birth_date) VALUES ('{$student->getName()}','{$student->getBirthDate()->format('Y-m-d')}');";
