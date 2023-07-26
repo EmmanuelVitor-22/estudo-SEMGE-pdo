@@ -6,7 +6,7 @@ use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
 require 'vendor/autoload.php';
 
 $pdo = ConnectionCreator::createConnection();
-$student = new Students(null,"Tour",new DateTimeImmutable("2000-12-06"));
+$student = new Students(null,"Jonas",new DateTimeImmutable("1999-12-06"));
 // forma simples de inserir
 //$sqlInsert = "INSERT INTO students (name, birth_date) VALUES ('{$student->getName()}','{$student->getBirthDate()->format('Y-m-d')}');";
 //$result = $pdo->exec($sqlInsert);
