@@ -21,17 +21,26 @@ class PdoStudentRepository implements StudentRepository
         $queryAllStudents = $this->connection->query('SELECT * FROM students');
         $listAllStudents = $queryAllStudents->fetchAll(\PDO::FETCH_ASSOC);
         $resultAllStudentsObj = [];
-
         foreach ($listAllStudents as $student) {
             $resultAllStudentsObj[] = new Students($student['id'],$student["name"], new \DateTimeImmutable($student['birth_date']));
         }
-
         return $resultAllStudentsObj;
     }
 
-    public function studentsBirthAt(): array
+    public function studentsBirthAt($birth_date):array
     {
-        return [];
+        $queryAllStudentsBirthAt = $this->connection->prepare('SELECT * FROM students WHERE birth_date = ?');
+        $queryAllStudentsBirthAt->bindValue(1, $birth_date);
+        $queryAllStudentsBirthAt->execute();
+
+        $listAllStudentsBirthAt = $queryAllStudentsBirthAt->fetchAll(\PDO::FETCH_ASSOC);
+
+
+        $resultAllStudentsObj = [];
+        foreach ($listAllStudentsBirthAt as $student) {
+            $resultAllStudentsObj[] = new Students($student['id'],$student["name"], new \DateTimeImmutable($student['$birth_date']));
+        }
+        return $resultAllStudentsObj;
     }
 
     public function save(): bool

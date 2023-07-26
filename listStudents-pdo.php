@@ -20,7 +20,7 @@ require 'vendor/autoload.php';
 //        print_r($resultStudentList);
 //    }
     $pdoRepositoryStudent =  new PdoStudentRepository();
-    print_r($pdoRepositoryStudent->allStudent());
+    print_r($pdoRepositoryStudent->studentsBirthAt("1999-12-06"));
 
     //EXECUTANDO APENAS UM POR VEZ (evitar esturar memoria quando tem diversos registros)
     //while ($resultStudent = $result->fetch(PDO::FETCH_ASSOC)){
