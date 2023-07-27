@@ -85,21 +85,11 @@ class PdoStudentRepository implements StudentRepository
 
     public function remove(Students $student): bool
     {
-        try {
             $pdo = $this->connection;
             $queryDeleteStudent = $pdo->prepare('DELETE FROM students WHERE id :id');
             $queryDeleteStudent->bindValue(":id", $student->getId(), PDO::PARAM_INT);
-            $queryDeleteStudent->execute();
-            if ($queryDeleteStudent->rowCount() > 0) {
-                print_r( "O estudandote $student foi excluido");
-                return true;
-            }
-            print_r ("Você tentou excluir um estudante com id $student porém houve algum problemas.
-            Reveja as informações e corrija se nescessario.");
-            return false;
-        } catch (\PDOException $PDOException) {
-            throw  new \Exception($PDOException->getMessage());
-        }
+            return $queryDeleteStudent->execute();
+
     }
     public function update($id, $studentName=null,$studentBirthDate = null):bool
     {
