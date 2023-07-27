@@ -6,7 +6,7 @@ use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
 require 'vendor/autoload.php';
 
 //$pdo = ConnectionCreator::createConnection();
-$student = new Students(null,"Luis Lima",new DateTimeImmutable("1996-10-30"));
+$student = new Students(null,"Naci Lima",new DateTimeImmutable("1996-10-30"));
 $insert = new PdoStudentRepository();
 $insert->save($student);
 

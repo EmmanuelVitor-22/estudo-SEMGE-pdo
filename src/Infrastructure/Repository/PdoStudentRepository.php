@@ -51,7 +51,7 @@ class PdoStudentRepository implements StudentRepository
             $queryInsertInto->bindValue(1, $student->getName());
             $queryInsertInto->bindValue(2, $student->getBirthDate()->format('Y-m-d'));
             $queryInsertInto->execute();
-
+            echo "O estudante com  {$student->getName()} foi cadastrado";
             return true;
         }catch (\PDOException $PDOException){
             throw  new \Exception($PDOException->getMessage());
@@ -64,10 +64,14 @@ class PdoStudentRepository implements StudentRepository
             $pdo = $this->connection;
             $queryDeleteStudent = $pdo->prepare('DELETE FROM students WHERE id = ?');
             $queryDeleteStudent->bindValue(1, $id, PDO::PARAM_INT);
-            if ($queryDeleteStudent->rowCount() > 0) {
-                $queryDeleteStudent->execute();
-            }
-            return true;
+            $queryDeleteStudent->execute();
+            if ($queryDeleteStudent->rowCount()>0) {
+                echo "O estudandote com id $id foi excluido";
+                return true;
+             }
+            echo "Você tentou excluir um estudante com id $id porém houve algum problemas.
+            Reveja as informações e corrija se nescessario.";
+            return false;
         }catch (\PDOException $PDOException){
             throw  new \Exception($PDOException->getMessage());
         }
