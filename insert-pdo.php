@@ -7,6 +7,7 @@ require 'vendor/autoload.php';
 
 //$pdo = ConnectionCreator::createConnection();
 $student = new Students(null,"Naci Lima",new DateTimeImmutable("1996-10-30"));
+// usando padrao repository
 $insert = new PdoStudentRepository();
 $insert->save($student);
 

@@ -70,6 +70,7 @@ class PdoStudentRepository implements StudentRepository
 
     public function save(Students $student): bool
     {
+
         try {
             $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (?,?)');
             $queryInsertInto->bindValue(1, $student->getName());
@@ -82,19 +83,19 @@ class PdoStudentRepository implements StudentRepository
         }
     }
 
-    public function remove($id): bool
+    public function remove(Students $student): bool
     {
         try {
             $pdo = $this->connection;
-            $queryDeleteStudent = $pdo->prepare('DELETE FROM students WHERE id = ?');
-            $queryDeleteStudent->bindValue(1, $id, PDO::PARAM_INT);
+            $queryDeleteStudent = $pdo->prepare('DELETE FROM students WHERE id :id');
+            $queryDeleteStudent->bindValue(":id", $student->getId(), PDO::PARAM_INT);
             $queryDeleteStudent->execute();
             if ($queryDeleteStudent->rowCount() > 0) {
-                echo "O estudandote com id $id foi excluido";
+                print_r( "O estudandote $student foi excluido");
                 return true;
             }
-            echo "Você tentou excluir um estudante com id $id porém houve algum problemas.
-            Reveja as informações e corrija se nescessario.";
+            print_r ("Você tentou excluir um estudante com id $student porém houve algum problemas.
+            Reveja as informações e corrija se nescessario.");
             return false;
         } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
