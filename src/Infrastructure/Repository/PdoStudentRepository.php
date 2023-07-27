@@ -95,44 +95,41 @@ class PdoStudentRepository implements StudentRepository
             throw  new \Exception($PDOException->getMessage());
         }
     }
-//    public function update($id, $studentName,$studentBirthDate ): bool
-//    {
-//        $student = $this->studentById($id);
-//
-//
-//
-//        $pdo = $this->connection;
-//        $stmt = 'UPDATE students SET ';
-//        if(!empty($studentName)){
-//            $stmt .= 'name = ?';
-//        }
-//
-//        if(!empty($studentBirthDate)){
-//            if(!empty($studentName)){
-//                $stmt .= ', ';
-//            }
-//            $stmt .= ' birth_date = ?';
-//        }
-//        $stmt .= ' WHERE id = ? ';
-//
-//        $query = $pdo->prepare($stmt);
-//
-//        if (!empty($novo_nome)) {
-//            $query->bindValue(1, $studentName);
-//        }
-//
-//        if (!empty($nova_data_nascimento)) {
-//            $query->bindValue(2 , $studentBirthDate->format('Y-m-d'));
-//        }
-//
-//        $query->bindValue(3, $id);
-//        if ($query->execute()) {
-//            echo 'Estudante atualizado com sucesso';
-//            return true;
-//        } else {
-//            echo 'Erro ao atualizar o estudante';
-//            return false;
-//        }
-//    }
-//}
+    public function update($id, $studentName=null,$studentBirthDate = null):bool
+    {
+        $pdo = $this->connection;
+        $stmt = 'UPDATE students SET ';
+
+        $stmt = 'UPDATE students SET ';
+        if((!empty($studentName)) && (!empty($studentBirthDate))){
+            $stmt .= 'name = ?, birth_date = ? WHERE id = ?';
+            $query = $pdo->prepare($stmt);
+            $query->bindValue(1, $studentName);
+            $query->bindValue(2, $studentBirthDate->format('Y-m-d'));
+            $query->bindValue(3, $id);
+        }elseif (!empty($studentBirthDate)){
+            if(empty($studentName)|| $studentName == null){
+                $stmt .= ' birth_date = ? WHERE id = ?';
+                $query = $pdo->prepare($stmt);
+                $query->bindValue(1, $studentBirthDate->format('Y-m-d'));
+                $query->bindValue(2, $id);
+            }
+
+        }
+        else{
+            $stmt .= 'name = ? WHERE id = ?';
+            $query = $pdo->prepare($stmt);
+            $query->bindValue(1, $studentName);
+            $query->bindValue(2, $id);
+        }
+
+        if ($query->execute()) {
+            echo 'Estudante atualizado com sucesso';
+            return true;
+        } else {
+            echo 'Erro ao atualizar o estudante';
+            return false;
+        }
+    }
+
 }
