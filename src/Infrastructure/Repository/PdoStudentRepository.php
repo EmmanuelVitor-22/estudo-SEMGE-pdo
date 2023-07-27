@@ -68,19 +68,42 @@ class PdoStudentRepository implements StudentRepository
         return $resultAllStudentsObj;
     }
 
+   //metodo utilizado para salvar persistencia de novo cadastro
     public function save(Students $student): bool
     {
+        //verifica se o aluno exise ou não (se id == null ainda n existe)
+        if ($student->getId()===null){
+           return $this->insertStudent($student);
+        }
+        return $this->update($student);
+
+    }
+
+    public function insertStudent(Students $student):bool
+    {
+        $pdo = $this->connection;
 
         try {
             $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (?,?)');
-            $queryInsertInto->bindValue(1, $student->getName());
-            $queryInsertInto->bindValue(2, $student->getBirthDate()->format('Y-m-d'));
-            $queryInsertInto->execute();
+            $success = $queryInsertInto->execute([
+                1 => $student->getName(),
+                2 => $student->getBirthDate()->format('Y-m-d')
+            ]);
+            /*lastInsertId(): Este é um método da classe PDO que é chamado após a inserção de um novo registro no banco de dados usando uma declaração SQL como o INSERT.
+            Ele retorna o ID do último registro inserido na tabela específica que possui uma coluna autoincrementável.
+            Esse ID normalmente é gerado automaticamente pelo banco de dados, e é único para cada registro inserido na tabela*/
+            //nesse caso, o valor retornado está sendo usado para definir(set) o valor do id do objeto student criado;
+            // verificação de q somente funcionará se execução da declaração for verdadeira
+            if($success) {
+                $student->defineId($pdo->lastInsertId());
+            }
+
             echo "O estudante com  {$student->getName()} foi cadastrado";
-            return true;
+            return $success;
         } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
         }
+
     }
 
     public function remove(Students $student): bool
