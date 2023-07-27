@@ -15,6 +15,11 @@ class Students
         $this->birthDate = $birthDate;
     }
 
+    public function changeName(string $nameUpdated): void
+    {
+        $this->name = $nameUpdated;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
