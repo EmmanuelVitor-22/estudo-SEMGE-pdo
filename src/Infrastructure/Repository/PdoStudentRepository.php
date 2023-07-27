@@ -4,6 +4,8 @@ namespace Emmanuel\Infrastructure\Repository;
 use Emmanuel\Domain\Model\Students;
 use Emmanuel\Domain\Repository\StudentRepository;
 use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
+use http\Exception;
+use PDO;
 
 require "vendor/autoload.php";
 
@@ -35,7 +37,6 @@ class PdoStudentRepository implements StudentRepository
 
         $listAllStudentsBirthAt = $queryAllStudentsBirthAt->fetchAll(\PDO::FETCH_ASSOC);
 
-
         $resultAllStudentsObj = [];
         foreach ($listAllStudentsBirthAt as $student) {
             $resultAllStudentsObj[] = new Students($student['id'],$student["name"], new \DateTimeImmutable($student['$birth_date']));
@@ -43,14 +44,33 @@ class PdoStudentRepository implements StudentRepository
         return $resultAllStudentsObj;
     }
 
-    public function save(): bool
+    public function save(Students $student): bool
     {
-        return true;
+        try {
+            $queryInsertInto =  $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (?,?)');
+            $queryInsertInto->bindValue(1, $student->getName());
+            $queryInsertInto->bindValue(2, $student->getBirthDate()->format('Y-m-d'));
+            $queryInsertInto->execute();
+
+            return true;
+        }catch (\PDOException $PDOException){
+            throw  new \Exception($PDOException->getMessage());
+        }
     }
 
-    public function remove(): bool
+    public function remove($id): bool
     {
-        return true;
+        try {
+            $pdo = $this->connection;
+            $queryDeleteStudent = $pdo->prepare('DELETE FROM students WHERE id = ?');
+            $queryDeleteStudent->bindValue(1, $id, PDO::PARAM_INT);
+            if ($queryDeleteStudent->rowCount() > 0) {
+                $queryDeleteStudent->execute();
+            }
+            return true;
+        }catch (\PDOException $PDOException){
+            throw  new \Exception($PDOException->getMessage());
+        }
     }
 
     public function update(): bool
