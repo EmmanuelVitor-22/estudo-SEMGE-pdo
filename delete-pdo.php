@@ -17,6 +17,6 @@ require 'vendor/autoload.php';
 //    echo "não";
 //}
 $deleteRepository  = new PdoStudentRepository();
-$deleteRepository->remove(50);
+$deleteRepository->remove(3);
 
 

@@ -23,13 +23,16 @@ class PdoStudentRepository implements StudentRepository
         $queryAllStudents = $this->connection->query('SELECT * FROM students');
         $listAllStudents = $queryAllStudents->fetchAll(\PDO::FETCH_ASSOC);
         $resultAllStudentsObj = [];
+
         foreach ($listAllStudents as $student) {
-            $resultAllStudentsObj[] = new Students($student['id'],$student["name"], new \DateTimeImmutable($student['birth_date']));
+            $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['birth_date']));
+
         }
+
         return $resultAllStudentsObj;
     }
 
-    public function studentsBirthAt($birth_date):array
+    public function studentsBirthAt($birth_date): array
     {
         $queryAllStudentsBirthAt = $this->connection->prepare('SELECT * FROM students WHERE birth_date = ?');
         $queryAllStudentsBirthAt->bindValue(1, $birth_date);
@@ -39,7 +42,23 @@ class PdoStudentRepository implements StudentRepository
 
         $resultAllStudentsObj = [];
         foreach ($listAllStudentsBirthAt as $student) {
-            $resultAllStudentsObj[] = new Students($student['id'],$student["name"], new \DateTimeImmutable($student['$birth_date']));
+            $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['$birth_date']));
+        }
+        return $resultAllStudentsObj;
+    }
+
+    public function studentById($id): array
+    {
+        $pdo = $this->connection;
+        $queryAllStudentsBirthAt = $pdo->prepare('SELECT * FROM students WHERE id = ?');
+        $queryAllStudentsBirthAt->bindValue(1, $id);
+        $queryAllStudentsBirthAt->execute();
+
+        $listAllStudentsBirthAt = $queryAllStudentsBirthAt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $resultAllStudentsObj = [];
+        foreach ($listAllStudentsBirthAt as $student) {
+            $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['$birth_date']));
         }
         return $resultAllStudentsObj;
     }
@@ -47,13 +66,13 @@ class PdoStudentRepository implements StudentRepository
     public function save(Students $student): bool
     {
         try {
-            $queryInsertInto =  $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (?,?)');
+            $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (?,?)');
             $queryInsertInto->bindValue(1, $student->getName());
             $queryInsertInto->bindValue(2, $student->getBirthDate()->format('Y-m-d'));
             $queryInsertInto->execute();
             echo "O estudante com  {$student->getName()} foi cadastrado";
             return true;
-        }catch (\PDOException $PDOException){
+        } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
         }
     }
@@ -65,20 +84,55 @@ class PdoStudentRepository implements StudentRepository
             $queryDeleteStudent = $pdo->prepare('DELETE FROM students WHERE id = ?');
             $queryDeleteStudent->bindValue(1, $id, PDO::PARAM_INT);
             $queryDeleteStudent->execute();
-            if ($queryDeleteStudent->rowCount()>0) {
+            if ($queryDeleteStudent->rowCount() > 0) {
                 echo "O estudandote com id $id foi excluido";
                 return true;
-             }
+            }
             echo "Você tentou excluir um estudante com id $id porém houve algum problemas.
             Reveja as informações e corrija se nescessario.";
             return false;
-        }catch (\PDOException $PDOException){
+        } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
         }
     }
-
-    public function update(): bool
-    {
-        return true;
-    }
+//    public function update($id, $studentName,$studentBirthDate ): bool
+//    {
+//        $student = $this->studentById($id);
+//
+//
+//
+//        $pdo = $this->connection;
+//        $stmt = 'UPDATE students SET ';
+//        if(!empty($studentName)){
+//            $stmt .= 'name = ?';
+//        }
+//
+//        if(!empty($studentBirthDate)){
+//            if(!empty($studentName)){
+//                $stmt .= ', ';
+//            }
+//            $stmt .= ' birth_date = ?';
+//        }
+//        $stmt .= ' WHERE id = ? ';
+//
+//        $query = $pdo->prepare($stmt);
+//
+//        if (!empty($novo_nome)) {
+//            $query->bindValue(1, $studentName);
+//        }
+//
+//        if (!empty($nova_data_nascimento)) {
+//            $query->bindValue(2 , $studentBirthDate->format('Y-m-d'));
+//        }
+//
+//        $query->bindValue(3, $id);
+//        if ($query->execute()) {
+//            echo 'Estudante atualizado com sucesso';
+//            return true;
+//        } else {
+//            echo 'Erro ao atualizar o estudante';
+//            return false;
+//        }
+//    }
+//}
 }

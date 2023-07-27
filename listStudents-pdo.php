@@ -3,8 +3,7 @@
 use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
 
 require 'vendor/autoload.php';
-    $database =  __DIR__ . '/database.sqlite';
-    $pdo = new PDO('sqlite:' . $database);
+
 
 //    $result = $pdo->query('SELECT * FROM students');
 //    //Busca os dados inseridos no banco de dados retornando como um array associativo
@@ -33,4 +32,4 @@ require 'vendor/autoload.php';
 
     //usando repositorio
     $pdoRepositoryStudent =  new PdoStudentRepository();
-    print_r($pdoRepositoryStudent->studentsBirthAt("1999-12-06"));
+    print_r($pdoRepositoryStudent->allStudent());
