@@ -15,6 +15,17 @@ class Students
         $this->birthDate = $birthDate;
     }
 
+    //Metodo para definir o id caso no momento da criação não tenha sido definido
+    // é o mesmo que "setId
+    public function defineId(int $id):void
+    {
+        if (!is_null($this->id)){
+            throw  new  \DomainException("Você só pode definir um ID por vez");
+        }
+        $this->id = $id;
+
+    }
+
     public function changeName(string $nameUpdated): void
     {
         $this->name = $nameUpdated;
@@ -25,10 +36,6 @@ class Students
         return $this->id;
     }
 
-    public function setId(?int $id): void
-    {
-        $this->id = $id;
-    }
 
     public function getName(): string
     {
