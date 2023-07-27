@@ -25,8 +25,10 @@ class PdoStudentRepository implements StudentRepository
         $resultAllStudentsObj = [];
 
         foreach ($listAllStudents as $student) {
-            $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['birth_date']));
-
+            // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
+            if (isset($student['id'], $student["name"], $student['birth_date'])) {
+                $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['birth_date']));
+            }
         }
 
         return $resultAllStudentsObj;
@@ -42,7 +44,10 @@ class PdoStudentRepository implements StudentRepository
 
         $resultAllStudentsObj = [];
         foreach ($listAllStudentsBirthAt as $student) {
-            $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['$birth_date']));
+            // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
+            if (isset($student['id'], $student["name"], $student['birth_date'])) {
+                $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['$birth_date']));
+            }
         }
         return $resultAllStudentsObj;
     }
