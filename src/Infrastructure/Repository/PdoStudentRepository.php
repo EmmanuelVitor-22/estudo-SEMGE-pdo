@@ -76,10 +76,10 @@ class PdoStudentRepository implements StudentRepository
         $pdo = $this->connection;
 
         try {
-            $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (?,?)');
+            $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (:name,:birth_date)');
             $success = $queryInsertInto->execute([
-                1 => $student->getName(),
-                2 => $student->getBirthDate()->format('Y-m-d')
+                ":name" => $student->getName(),
+                ":birth_date" => $student->getBirthDate()->format('Y-m-d')
             ]);
             /*lastInsertId(): Este é um método da classe PDO que é chamado após a inserção de um novo registro no banco de dados usando uma declaração SQL como o INSERT.
             Ele retorna o ID do último registro inserido na tabela específica que possui uma coluna autoincrementável.
@@ -90,7 +90,7 @@ class PdoStudentRepository implements StudentRepository
                 $student->defineId($pdo->lastInsertId());
             }
 
-            echo "O estudante com  {$student->getName()} foi cadastrado";
+            echo "O(A) estudante {$student->getName()} foi cadastrado(a)." . PHP_EOL;
             return $success;
         } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
