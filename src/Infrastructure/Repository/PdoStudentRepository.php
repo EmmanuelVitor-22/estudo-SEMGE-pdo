@@ -18,38 +18,36 @@ class PdoStudentRepository implements StudentRepository
         $this->connection = ConnectionCreator::createConnection();
     }
 
+    private function hydrateStudentList(\PDOStatement  $PDOStatement)
+    {
+        $studentsDataList = $PDOStatement->fetchAll(\PDO::FETCH_ASSOC);
+        $resultStudentList= [];
+
+        foreach ($studentsDataList as $studentData) {
+            // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
+            if (isset($studentData['id'], $studentData["name"], $studentData['birth_date'])) {
+                $resultStudentList[] = new Students($studentData['id'],
+                                                        $studentData["name"],
+                                                        new \DateTimeImmutable($studentData['birth_date'])
+                                                       );
+            }
+        }
+
+        return $resultStudentList;
+
+    }
     public function allStudent(): array
     {
         $queryAllStudents = $this->connection->query('SELECT * FROM students');
-        $listAllStudents = $queryAllStudents->fetchAll(\PDO::FETCH_ASSOC);
-        $resultAllStudentsObj = [];
-
-        foreach ($listAllStudents as $student) {
-            // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
-            if (isset($student['id'], $student["name"], $student['birth_date'])) {
-                $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['birth_date']));
-            }
-        }
-
-        return $resultAllStudentsObj;
+        return $this->hydrateStudentList($queryAllStudents);
     }
 
-    public function studentsBirthAt($birth_date): array
+    public function studentsBirthAt(\DateTimeInterface $birth_date): array
     {
         $queryAllStudentsBirthAt = $this->connection->prepare('SELECT * FROM students WHERE birth_date = ?');
-        $queryAllStudentsBirthAt->bindValue(1, $birth_date);
-        $queryAllStudentsBirthAt->execute();
+        $queryAllStudentsBirthAt->execute([$birth_date->format("Y-m-d")]);
 
-        $listAllStudentsBirthAt = $queryAllStudentsBirthAt->fetchAll(\PDO::FETCH_ASSOC);
-
-        $resultAllStudentsObj = [];
-        foreach ($listAllStudentsBirthAt as $student) {
-            // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
-            if (isset($student['id'], $student["name"], $student['birth_date'])) {
-                $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['$birth_date']));
-            }
-        }
-        return $resultAllStudentsObj;
+        return $this->hydrateStudentList($queryAllStudentsBirthAt);
     }
 
     public function studentById($id): array
