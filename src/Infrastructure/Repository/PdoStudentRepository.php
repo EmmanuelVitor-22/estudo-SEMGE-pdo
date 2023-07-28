@@ -27,7 +27,9 @@ class PdoStudentRepository implements StudentRepository
         foreach ($listAllStudents as $student) {
             // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
             if (isset($student['id'], $student["name"], $student['birth_date'])) {
-                $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['birth_date']));
+                $resultAllStudentsObj[] = new Students($student['id'],
+                                                        $student["name"],
+                                                        new \DateTimeImmutable($student['birth_date']));
             }
         }
 
