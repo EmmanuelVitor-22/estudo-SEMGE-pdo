@@ -13,9 +13,9 @@ class PdoStudentRepository implements StudentRepository
 {
     private \PDO $connection;
 
-    public function __construct()
+    public function __construct($connection)
     {
-        $this->connection = ConnectionCreator::createConnection();
+        $this->connection = $connection;
     }
 
     private function hydrateStudentList(\PDOStatement  $PDOStatement)
@@ -53,17 +53,11 @@ class PdoStudentRepository implements StudentRepository
     public function studentById($id): array
     {
         $pdo = $this->connection;
-        $queryAllStudentsBirthAt = $pdo->prepare('SELECT * FROM students WHERE id = ?');
-        $queryAllStudentsBirthAt->bindValue(1, $id);
-        $queryAllStudentsBirthAt->execute();
+        $queryStudentsById = $pdo->prepare('SELECT * FROM students WHERE id = ?');
+        $queryStudentsById->execute([$id]);
 
-        $listAllStudentsBirthAt = $queryAllStudentsBirthAt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->hydrateStudentList($queryStudentsById);
 
-        $resultAllStudentsObj = [];
-        foreach ($listAllStudentsBirthAt as $student) {
-            $resultAllStudentsObj[] = new Students($student['id'], $student["name"], new \DateTimeImmutable($student['$birth_date']));
-        }
-        return $resultAllStudentsObj;
     }
 
    //metodo utilizado para salvar persistencia de novo cadastro
