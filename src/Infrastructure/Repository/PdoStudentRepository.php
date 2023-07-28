@@ -114,41 +114,15 @@ class PdoStudentRepository implements StudentRepository
             return $queryDeleteStudent->execute();
 
     }
-    public function update($id, $studentName=null,$studentBirthDate = null):bool
+    public function update(Students $student):bool
     {
         $pdo = $this->connection;
-        $stmt = 'UPDATE students SET ';
+        $updateQuery = $pdo->prepare('UPDATE students SET name = :name, birth_date= :birth_date WHERE id = :id');
+        return $updateQuery->execute([ ":name" => $student->getName(),
+                                ":birth_date" =>$student->getBirthDate()->format('Y-m-d'),
+                                ":id" => $student->getId()
+        ]);
 
-        $stmt = 'UPDATE students SET ';
-        if((!empty($studentName)) && (!empty($studentBirthDate))){
-            $stmt .= 'name = ?, birth_date = ? WHERE id = ?';
-            $query = $pdo->prepare($stmt);
-            $query->bindValue(1, $studentName);
-            $query->bindValue(2, $studentBirthDate->format('Y-m-d'));
-            $query->bindValue(3, $id);
-        }elseif (!empty($studentBirthDate)){
-            if(empty($studentName)|| $studentName == null){
-                $stmt .= ' birth_date = ? WHERE id = ?';
-                $query = $pdo->prepare($stmt);
-                $query->bindValue(1, $studentBirthDate->format('Y-m-d'));
-                $query->bindValue(2, $id);
-            }
-
-        }
-        else{
-            $stmt .= 'name = ? WHERE id = ?';
-            $query = $pdo->prepare($stmt);
-            $query->bindValue(1, $studentName);
-            $query->bindValue(2, $id);
-        }
-
-        if ($query->execute()) {
-            echo 'Estudante atualizado com sucesso';
-            return true;
-        } else {
-            echo 'Erro ao atualizar o estudante';
-            return false;
-        }
     }
 
 }
