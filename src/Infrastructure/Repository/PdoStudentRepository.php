@@ -89,7 +89,6 @@ class PdoStudentRepository implements StudentRepository
             if($success) {
                 $student->defineId($pdo->lastInsertId());
             }
-
             echo "O(A) estudante {$student->getName()} foi cadastrado(a)." . PHP_EOL;
             return $success;
         } catch (\PDOException $PDOException) {

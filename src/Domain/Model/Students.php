@@ -7,7 +7,7 @@ class Students
     private ?int $id;
     private string $name;
     private \DateTimeInterface $birthDate;
-    private Phone $phones = [];
+    private $phones = [];
 
     public function __construct(?int $id, string $name, \DateTimeInterface $birthDate)
     {
