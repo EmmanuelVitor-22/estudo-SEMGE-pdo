@@ -1,6 +1,7 @@
 <?php
 namespace Emmanuel\Infrastructure\Repository;
 
+use Emmanuel\Domain\Model\Phone;
 use Emmanuel\Domain\Model\Students;
 use Emmanuel\Domain\Repository\StudentRepository;
 use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
@@ -26,10 +27,12 @@ class PdoStudentRepository implements StudentRepository
         foreach ($studentsDataList as $studentData) {
             // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
             if (isset($studentData['id'], $studentData["name"], $studentData['birth_date'])) {
-                $resultStudentList[] = new Students($studentData['id'],
-                                                        $studentData["name"],
-                                                        new \DateTimeImmutable($studentData['birth_date'])
-                                                       );
+                $student = new Students($studentData['id'],
+                                        $studentData["name"],
+                                        new \DateTimeImmutable($studentData['birth_date'])
+                                       );
+                $this->fillPhoneOf($student);
+                $resultStudentList[] = $student;
             }
         }
 
@@ -113,6 +116,24 @@ class PdoStudentRepository implements StudentRepository
                                 ":birth_date" =>$student->getBirthDate()->format('Y-m-d'),
                                 ":id" => $student->getId()
         ]);
+
+    }
+
+    private function fillPhoneOf(Students $student)
+    {
+        $pdo=$this->connection;
+        $query= $pdo->prepare('SELECT id, area_code, number FROM phones WHERE student_id = :id ');
+        $query->execute([':id'=>$student->getId()]);
+
+        $resultDataPhone = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($resultDataPhone as $dataPhone) {
+            $studentPhone = new Phone($dataPhone['id'],
+                                      $dataPhone['area_code'],
+                                      $dataPhone['number']
+                                     );
+            $student->setPhones($studentPhone);
+        }
 
     }
 
