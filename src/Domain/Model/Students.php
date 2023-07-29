@@ -7,6 +7,7 @@ class Students
     private ?int $id;
     private string $name;
     private \DateTimeInterface $birthDate;
+    private Phone $phones = [];
 
     public function __construct(?int $id, string $name, \DateTimeInterface $birthDate)
     {
@@ -14,6 +15,26 @@ class Students
         $this->name = $name;
         $this->birthDate = $birthDate;
     }
+
+    /**
+     * @return array
+     */
+    public function getPhones(): array
+    {
+        return $this->phones;
+    }
+
+    /**
+     * @param Phone $phones
+     * correspomde ao metodo addPhone
+     */
+    public function setPhones(Phone $phone): void
+    {
+        $this->phones[] = $phone;
+    }
+
+
+
 
     //Metodo para definir o id caso no momento da criação não tenha sido definido
     // é o mesmo que "setId

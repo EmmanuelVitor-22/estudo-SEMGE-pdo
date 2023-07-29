@@ -16,6 +16,12 @@ class Phone
         $this->number = $number;
     }
 
+    public function formattedPhone():string
+    {
+        return "($this->areaCode) $this->number";
+
+    }
+
     /**
      * @return int|null
      */
