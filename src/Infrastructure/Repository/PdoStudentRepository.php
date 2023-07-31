@@ -31,7 +31,7 @@ class PdoStudentRepository implements StudentRepository
                                         $studentData["name"],
                                         new \DateTimeImmutable($studentData['birth_date'])
                                        );
-                $this->fillPhoneOf($student);
+//                $this->fillPhoneOf($student);
                 $resultStudentList[] = $student;
             }
         }
@@ -53,16 +53,43 @@ class PdoStudentRepository implements StudentRepository
         return $this->hydrateStudentList($queryAllStudentsBirthAt);
     }
 
-    public function studentById($id): array
+    public function studentsById(Students $student): array
     {
         $pdo = $this->connection;
         $queryStudentsById = $pdo->prepare('SELECT * FROM students WHERE id = ?');
-        $queryStudentsById->execute([$id]);
+        $queryStudentsById->execute([$student->getId()]);
 
         return $this->hydrateStudentList($queryStudentsById);
 
     }
 
+    public function studentsWithPhone(Students $student):array
+    {
+
+        $pdo = $this->connection;
+        $queryStudentsWithPhone = $pdo->query('SELECT   students.id,
+                                                            students.name,
+                                                            students.birth_date,
+                                                            phones.id AS phone_id ,
+                                                            phones.area_code,
+                                                            phones.number
+                                                   FROM students
+                                                   JOIN phones ON phones.id = students.id');
+       $result = $queryStudentsWithPhone->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($result as $row) {
+            $studentList = [];
+            if (!array_key_exists($row['id'], $studentList)){
+                $studentList[] = new Students(  $row['id'],
+                                                $row["name"],
+                                                new \DateTimeImmutable($row['birth_date'])
+                );
+            }
+            $phoneStudent = new Phone(null, "45", "1111111");
+            $studentList[$row['id']]->setPhones($phoneStudent);
+
+       }
+        return $studentList;
+    }
    //metodo utilizado para salvar persistencia de novo cadastro
     public function save(Students $student): bool
     {
@@ -119,22 +146,22 @@ class PdoStudentRepository implements StudentRepository
 
     }
 
-    private function fillPhoneOf(Students $student)
-    {
-        $pdo=$this->connection;
-        $query= $pdo->prepare('SELECT id, area_code, number FROM phones WHERE student_id = :id ');
-        $query->execute([':id'=>$student->getId()]);
-
-        $resultDataPhone = $query->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($resultDataPhone as $dataPhone) {
-            $studentPhone = new Phone($dataPhone['id'],
-                                      $dataPhone['area_code'],
-                                      $dataPhone['number']
-                                     );
-            $student->setPhones($studentPhone);
-        }
-
-    }
+//    private function fillPhoneOf(Students $student)
+//    {
+//        $pdo=$this->connection;
+//        $query= $pdo->prepare('SELECT id, area_code, number FROM phones WHERE student_id = :id ');
+//        $query->execute([':id'=>$student->getId()]);
+//
+//        $resultDataPhone = $query->fetchAll(PDO::FETCH_ASSOC);
+//
+//        foreach ($resultDataPhone as $dataPhone) {
+//            $studentPhone = new Phone($dataPhone['id'],
+//                                      $dataPhone['area_code'],
+//                                      $dataPhone['number']
+//                                     );
+//            $student->setPhones($studentPhone);
+//        }
+//
+//    }
 
 }

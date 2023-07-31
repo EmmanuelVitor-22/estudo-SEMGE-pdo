@@ -8,6 +8,8 @@ interface StudentRepository
 {
     public function allStudent():array;
     public function studentsBirthAt( \DateTimeInterface $bith_date):array;
+    public function studentsWithPhone(Students $student):array;
+    public function studentsById(Students $student):array;
     public function save(Students $student):bool;
     public function remove(Students $student):bool;
     public function update(Students $student):bool;

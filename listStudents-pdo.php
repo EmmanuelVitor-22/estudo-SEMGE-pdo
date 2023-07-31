@@ -34,4 +34,4 @@ require 'vendor/autoload.php';
     //usando repositorio
 
     $pdoRepositoryStudent =  new PdoStudentRepository(ConnectionCreator::createConnection());
-    print_r($pdoRepositoryStudent->allStudent());
+    print_r($pdoRepositoryStudent->studentsWithPhone());
