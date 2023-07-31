@@ -1,0 +1,9 @@
+SELECT students.id,
+       students.name,
+       students.birth_date,
+       phones.id AS phone_id,
+       phones.area_code,
+       phones.number
+FROM students
+JOIN phones
+ON phones.id = phones.student_id;

@@ -14,6 +14,7 @@ class Students
         $this->id = $id;
         $this->name = $name;
         $this->birthDate = $birthDate;
+
     }
 
     /**
@@ -28,7 +29,11 @@ class Students
      * @param Phone $phones
      * correspomde ao metodo addPhone
      */
-    public function setPhones(Phone $phone): void
+//    public function setPhones($id, $area_code, $number): void
+//    {
+//        $this->phones[] = new Phone($id, $area_code, $number);
+//    }
+ public function setPhones(Phone $phone): void
     {
         $this->phones[] = $phone;
     }

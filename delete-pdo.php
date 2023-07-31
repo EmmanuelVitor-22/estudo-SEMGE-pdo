@@ -1,7 +1,7 @@
 <?php
 
 
-
+use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
 use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
 
 require 'vendor/autoload.php';
@@ -16,7 +16,8 @@ require 'vendor/autoload.php';
 //}else{
 //    echo "não";
 //}
-$deleteRepository  = new PdoStudentRepository();
-$deleteRepository->remove(4);
+
+$deleteRepository  = new PdoStudentRepository(ConnectionCreator::createConnection());
+$deleteRepository->remove();
 
 

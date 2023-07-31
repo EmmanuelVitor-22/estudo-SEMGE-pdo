@@ -20,8 +20,9 @@ try {
              FOREIGN KEY (student_id) REFERENCES students(id)
         );
 ';
-
-    $pdo->exec($createTable);
+    $insert = "INSERT INTO phones (area_code, number, student_id)
+                VALUES ( '000', '111111111', 1),('111', '999999999', 1);";
+  $pdo->exec($insert);
 
 
 }catch (PDOException $exception){

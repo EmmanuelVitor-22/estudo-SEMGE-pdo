@@ -1,15 +1,23 @@
 <?php
 
 use Emmanuel\Domain\Model\Students;
+use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
 use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
 
 require 'vendor/autoload.php';
 
 //$pdo = ConnectionCreator::createConnection();
-$student = new Students(null,"Naci Lima",new DateTimeImmutable("1996-10-30"));
-// usando padrao repository
-$insert = new PdoStudentRepository();
-$insert->save($student);
+$connection = ConnectionCreator::createConnection();
+$studentRepository = new PdoStudentRepository($connection);
+
+$connection->beginTransaction();
+
+$emmanuel =  new Students(null, "Jhon Vitor", new DateTimeImmutable("1999-03-01"));
+//
+$studentRepository->save($emmanuel);
+
+$connection->commit();
+
 
 // forma simples de inserir
 //$sqlInsert = "INSERT INTO students (name, birth_date) VALUES ('{$student->getName()}','{$student->getBirthDate()->format('Y-m-d')}');";
