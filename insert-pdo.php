@@ -12,9 +12,10 @@ $studentRepository = new PdoStudentRepository($connection);
 
 $connection->beginTransaction();
 
-$emmanuel =  new Students(null, "Jhon Vitor", new DateTimeImmutable("1999-03-01"));
-//
-$studentRepository->save($emmanuel);
+$ana = new Students(null, "Ana Nery", new DateTimeImmutable("1999-03-01"));
+
+
+
 
 $connection->commit();
 

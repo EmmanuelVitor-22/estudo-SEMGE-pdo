@@ -14,8 +14,7 @@ class Students
         $this->id = $id;
         $this->name = $name;
         $this->birthDate = $birthDate;
-
-    }
+           }
 
     /**
      * @return array
@@ -33,9 +32,9 @@ class Students
 //    {
 //        $this->phones[] = new Phone($id, $area_code, $number);
 //    }
- public function setPhones(Phone $phone): void
+ public function setPhones($id, $area_code, $number): void
     {
-        $this->phones[] = $phone;
+        $this->phones[] = new Phone($id, $area_code, $number)   ;
     }
 
 

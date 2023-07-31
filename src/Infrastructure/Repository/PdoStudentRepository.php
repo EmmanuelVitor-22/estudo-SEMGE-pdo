@@ -1,11 +1,9 @@
 <?php
 namespace Emmanuel\Infrastructure\Repository;
 
-use Emmanuel\Domain\Model\Phone;
 use Emmanuel\Domain\Model\Students;
 use Emmanuel\Domain\Repository\StudentRepository;
-use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
-use http\Exception;
+
 use PDO;
 
 require "vendor/autoload.php";
@@ -31,6 +29,7 @@ class PdoStudentRepository implements StudentRepository
                                         $studentData["name"],
                                         new \DateTimeImmutable($studentData['birth_date'])
                                        );
+
 
                 $resultStudentList[] = $student;
             }
@@ -74,7 +73,7 @@ class PdoStudentRepository implements StudentRepository
                                                              phones.number
                                                       FROM students
                                                       JOIN phones 
-                                                      ON phones.id = phones.student_id');
+                                                      ON students.id = phones.student_id');
 
         $result = $queryStudentsWithPhone->fetchAll(PDO::FETCH_ASSOC);
         $studentList = [];
@@ -86,8 +85,8 @@ class PdoStudentRepository implements StudentRepository
                                         new \DateTimeImmutable($row['birth_date'])
                 );
             }
-            $pn = new Phone($row['phone_id'], $row['area_code'], $row['number']);
-            $studentList[$row['id']]->setPhones($pn);
+
+            $studentList[$row['id']]->setPhones($row['phone_id'], $row['area_code'], $row['number']);
         }
         return $studentList;
 
@@ -132,7 +131,7 @@ class PdoStudentRepository implements StudentRepository
     public function remove(): bool
     {
             $pdo = $this->connection;
-            $queryDeleteStudent = $pdo->prepare('DELETE FROM phones');
+            $queryDeleteStudent = $pdo->prepare('DELETE FROM students');
 //            $queryDeleteStudent->bindValue(":id", $student->getId(), PDO::PARAM_INT);
         echo "truncou";
         return $queryDeleteStudent->execute();
