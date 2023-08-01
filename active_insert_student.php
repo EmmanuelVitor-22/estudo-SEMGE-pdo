@@ -15,6 +15,7 @@ try {
     $studentRepository->save($student);
     $connection->commit();
 } catch (Exception $e) {
+
     echo $e->getMessage();
 }
 
