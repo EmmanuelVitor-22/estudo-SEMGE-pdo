@@ -1,24 +1,7 @@
 <?php
 
-use Emmanuel\Domain\Model\Students;
-use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
-use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
 
 require 'vendor/autoload.php';
-
-//$pdo = ConnectionCreator::createConnection();
-$connection = ConnectionCreator::createConnection();
-$studentRepository = new PdoStudentRepository($connection);
-
-$connection->beginTransaction();
-
-$ana = new Students(null, "Ana Nery", new DateTimeImmutable("1999-03-01"));
-
-
-
-
-$connection->commit();
-
 
 // forma simples de inserir
 //$sqlInsert = "INSERT INTO students (name, birth_date) VALUES ('{$student->getName()}','{$student->getBirthDate()->format('Y-m-d')}');";
