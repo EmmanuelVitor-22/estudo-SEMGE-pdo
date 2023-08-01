@@ -28,9 +28,9 @@ class Students
      * @param Phone $phones
      * correspomde ao metodo addPhone
      */
-    public function setPhones($id, $area_code, $number): void
+    public function setPhones(Phone $phone): void
     {
-        $this->phones[] = new Phone($id, $area_code, $number);
+        $this->phones[] = $phone;
     }
 
 

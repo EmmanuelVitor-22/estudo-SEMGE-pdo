@@ -22,15 +22,13 @@ class Phone
 
     }
 
-    /**
-     * @return int|null
-     */
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id):void
+    public function defineId(int $id):void
     {
         if (!is_null($this->id)){
             throw  new  \DomainException("Você só pode definir um ID por vez");

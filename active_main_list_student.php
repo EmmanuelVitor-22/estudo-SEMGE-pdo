@@ -13,12 +13,21 @@ try {
     echo PHP_EOL;
     print_r($pdoRepositoryStudent->allStudent());
     echo PHP_EOL;
+<<<<<<< HEAD
     echo "===================================================\n";
     echo "\t\t Estudantes com seus mumeros\n";
     echo "===================================================";
     echo PHP_EOL;
     print_r($pdoRepositoryStudent->studentsWithPhone());
     echo PHP_EOL;
+=======
+//    echo "===================================================\n";
+//    echo "\t\t Estudantes com seus mumeros\n";
+//    echo "===================================================";
+//    echo PHP_EOL;
+//    print_r($pdoRepositoryStudent->studentsWithPhone());
+//    echo PHP_EOL;
+>>>>>>> 1e7587d7aea770d0d61254b52351c0b45c2b3b3e
 //    echo "===================================================\n";
 //    echo "\t\t Estudantes com por data de Nascimento\n";
 //    echo "===================================================";
