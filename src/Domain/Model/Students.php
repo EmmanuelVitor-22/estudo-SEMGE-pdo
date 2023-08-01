@@ -9,12 +9,12 @@ class Students
     private \DateTimeInterface $birthDate;
     private $phones = [];
 
-    public function __construct(?int $id, string $name, \DateTimeInterface $birthDate)
+    public function __construct(?int $id , string $name, \DateTimeInterface $birthDate)
     {
         $this->id = $id;
         $this->name = $name;
         $this->birthDate = $birthDate;
-           }
+    }
 
     /**
      * @return array
@@ -36,8 +36,6 @@ class Students
     {
         $this->phones[] = new Phone($id, $area_code, $number)   ;
     }
-
-
 
 
     //Metodo para definir o id caso no momento da criação não tenha sido definido
@@ -87,6 +85,7 @@ class Students
         return $this->birthDate->diff(new \DateTimeImmutable())->y;
 
     }
+
 
 
 }
