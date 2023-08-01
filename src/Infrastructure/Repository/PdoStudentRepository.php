@@ -27,8 +27,7 @@ class PdoStudentRepository implements StudentRepository
         foreach ($studentsDataList as $studentData) {
             // Verifica se o campo 'name' não é nulo antes de criar o objeto Students
             if (isset($studentData['id'], $studentData["name"], $studentData['birth_date'])) {
-                $student = new Students($studentData['id'],
-                                        $studentData["name"],
+                $student = new Students($studentData['id'], $studentData["name"],
                                         new \DateTimeImmutable($studentData['birth_date'])
                                        );
 //                $this->fillPhoneOf($student);
@@ -43,6 +42,22 @@ class PdoStudentRepository implements StudentRepository
     {
         $queryAllStudents = $this->connection->query('SELECT * FROM students');
         return $this->hydrateStudentList($queryAllStudents);
+    }
+
+    public function studentsWithPhone():array
+    {
+
+        $pdo = $this->connection;
+        $queryStudentsWithPhone = $pdo->query('SELECT students.id,
+                                                            students.name,
+                                                            students.birth_date,
+                                                            phones.id AS phone_id ,
+                                                            phones.area_code,
+                                                            phones.number
+                                                   FROM students
+                                                   JOIN phones ON phones.id = students.id');
+
+        return $this->hydrateStudentList($queryStudentsWithPhone);
     }
 
     public function studentsBirthAt(\DateTimeInterface $birth_date): array
@@ -63,33 +78,6 @@ class PdoStudentRepository implements StudentRepository
 
     }
 
-    public function studentsWithPhone(Students $student):array
-    {
-
-        $pdo = $this->connection;
-        $queryStudentsWithPhone = $pdo->query('SELECT   students.id,
-                                                            students.name,
-                                                            students.birth_date,
-                                                            phones.id AS phone_id ,
-                                                            phones.area_code,
-                                                            phones.number
-                                                   FROM students
-                                                   JOIN phones ON phones.id = students.id');
-       $result = $queryStudentsWithPhone->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($result as $row) {
-            $studentList = [];
-            if (!array_key_exists($row['id'], $studentList)){
-                $studentList[] = new Students(  $row['id'],
-                                                $row["name"],
-                                                new \DateTimeImmutable($row['birth_date'])
-                );
-            }
-            $phoneStudent = new Phone(null, "45", "1111111");
-            $studentList[$row['id']]->setPhones($phoneStudent);
-
-       }
-        return $studentList;
-    }
    //metodo utilizado para salvar persistencia de novo cadastro
     public function save(Students $student): bool
     {
@@ -111,22 +99,34 @@ class PdoStudentRepository implements StudentRepository
                 ":name" => $student->getName(),
                 ":birth_date" => $student->getBirthDate()->format('Y-m-d')
             ]);
-            /*lastInsertId(): Este é um método da classe PDO que é chamado após a inserção de um novo registro no banco de dados usando uma declaração SQL como o INSERT.
+            if ($success){
+                /*lastInsertId(): Este é um método da classe PDO que é chamado após a inserção de um novo registro no banco de dados usando uma declaração SQL como o INSERT.
             Ele retorna o ID do último registro inserido na tabela específica que possui uma coluna autoincrementável.
             Esse ID normalmente é gerado automaticamente pelo banco de dados, e é único para cada registro inserido na tabela*/
-            //nesse caso, o valor retornado está sendo usado para definir(set) o valor do id do objeto student criado;
-            // verificação de q somente funcionará se execução da declaração for verdadeira
-            if($success) {
+                //nesse caso, o valor retornado está sendo usado para definir(set) o valor do id do objeto student criado;
+                // verificação de q somente funcionará se execução da declaração for verdadeira
                 $student->defineId($pdo->lastInsertId());
+                $studentId = $student->getId();
+                $phone = $student->getPhones();
+                if ($phone instanceof Phone) {
+                    $student->setPhones(null, $phone->getAreaCode(), $phone->getNumber());
+                    $queryInsertIntoPhone = $this->connection->prepare('INSERT INTO phones (area_code, number, student_id) VALUES (:area_code,:numbe, :student_id)');
+                    $success = $queryInsertInto->execute([
+                        ":student_id" => $studentId,
+                        ":area_code" => $phone->getAreaCode(),
+                        ":number" => $phone->getNumber()
+                    ]);
+                }
             }
             echo "O(A) estudante {$student->getName()} foi cadastrado(a)." . PHP_EOL;
-            return $success;
+            return true;
+
+
         } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
         }
 
     }
-
     public function remove(Students $student): bool
     {
             $pdo = $this->connection;
