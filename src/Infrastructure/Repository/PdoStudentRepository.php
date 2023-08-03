@@ -40,7 +40,7 @@ class PdoStudentRepository implements StudentRepository
     public function removeAll()
     {
         $pdo = $this->connection;
-        $queryDeleteStudent = $pdo->prepare('DELETE FROM phones');
+        $queryDeleteStudent = $pdo->prepare('DELETE FROM students');
         return $queryDeleteStudent->execute();
 
 }
@@ -61,15 +61,15 @@ class PdoStudentRepository implements StudentRepository
         $studentList = [];
 
         foreach ($result as $row) {
-            if (!array_key_exists($row['id'], $studentList)) {
-                $studentList[$row['id']] = new Students(
-                    $row['id'],
+            if (!array_key_exists($row['student_id'], $studentList)) {
+                $studentList[$row['student_id']] = new Students(
+                    $row['student_id'],
                     $row["name"],
                     new \DateTimeImmutable($row['birth_date'])
                 );
             }
-//            $phoneStudent = new Phone();
-            $studentList[$row['id']]->setPhones($row['phone_id'], $row['area_code'], $row['number']);
+
+            $studentList[$row['student_id']]->setPhones($row['phone_id'], $row['area_code'], $row['number']);
         }
 
         return $studentList;
@@ -112,7 +112,8 @@ class PdoStudentRepository implements StudentRepository
         $pdo = $this->connection;
 
         try {
-            $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (:name,:birth_date)');
+            $queryInsertInto = $this->connection->prepare('INSERT INTO students (name, birth_date) 
+                                                                  VALUES (:name,:birth_date)');
             $success = $queryInsertInto->execute([
                 ":name" => $student->getName(),
                 ":birth_date" => $student->getBirthDate()->format('Y-m-d')
@@ -128,7 +129,7 @@ class PdoStudentRepository implements StudentRepository
                 // Insere os telefones associados ao aluno na tabela phones
                 foreach ($student->getPhones() as $phone) {
                     $queryInsertPhone= $pdo->prepare('INSERT INTO phones (student_id, area_code, number )
-                                                         VALUES  (:student_id, :area_code, :number )');
+                                                             VALUES  (:student_id, :area_code, :number )');
                     $queryInsertPhone->execute([
                         ":student_id" => $studentId,
                         ":area_code" => $phone->getAreaCode(),
@@ -138,7 +139,9 @@ class PdoStudentRepository implements StudentRepository
                     $phone->defineId($phoneId);
                 }
             }
-            echo "O(A) estudante {$student->getName()} foi cadastrado(a)." . PHP_EOL;
+            echo "O(A) estudante {$student->getName()} foi cadastrado(a)."
+                  . PHP_EOL .
+            " Seus telefones são: {$phone->formattedPhone()}";
             return $success;
         } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());

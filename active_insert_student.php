@@ -10,14 +10,12 @@ try {
 
     $connection = ConnectionCreator::createConnection();
     $studentRepository = new PdoStudentRepository($connection);
+
     $connection->beginTransaction();
 
-    $student = new Students(null, "João da Silva", new DateTimeImmutable("2000-05-10"));
-    $student->setPhones(null, "+55", "99999999");
-    $student->setPhones(null, "+55", "88888888");
-
-
-
+    $student = new Students(null, "Aline da Silva", new DateTimeImmutable("2000-05-10"));
+    $student->setPhones(null, "+55", "11111111");
+    $student->setPhones(null, "+55", "22222222S");
 
     $studentRepository->save($student);
 
