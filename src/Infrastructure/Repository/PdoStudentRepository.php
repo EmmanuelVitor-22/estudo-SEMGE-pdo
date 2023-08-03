@@ -37,13 +37,6 @@ class PdoStudentRepository implements StudentRepository
         return $resultStudentList;
     }
 // ...
-    public function removeAll()
-    {
-        $pdo = $this->connection;
-        $queryDeleteStudent = $pdo->prepare('DELETE FROM students');
-        return $queryDeleteStudent->execute();
-
-}
     public function studentsWithPhone(): array
     {
         $pdo = $this->connection;
@@ -68,7 +61,6 @@ class PdoStudentRepository implements StudentRepository
                     new \DateTimeImmutable($row['birth_date'])
                 );
             }
-
             $studentList[$row['student_id']]->setPhones($row['phone_id'], $row['area_code'], $row['number']);
         }
 
@@ -126,18 +118,7 @@ class PdoStudentRepository implements StudentRepository
             if($success) {
                 $studentId = $pdo->lastInsertId();
                 $student->defineId($studentId);
-                // Insere os telefones associados ao aluno na tabela phones
-                foreach ($student->getPhones() as $phone) {
-                    $queryInsertPhone= $pdo->prepare('INSERT INTO phones (student_id, area_code, number )
-                                                             VALUES  (:student_id, :area_code, :number )');
-                    $queryInsertPhone->execute([
-                        ":student_id" => $studentId,
-                        ":area_code" => $phone->getAreaCode(),
-                        ":number" => $phone->getNumber()
-                    ]);
-                    $phoneId = $pdo->lastInsertId();
-                    $phone->defineId($phoneId);
-                }
+                $this->insertPhone($student);
             }
             echo "O(A) estudante {$student->getName()} foi cadastrado(a)."
                   . PHP_EOL .
@@ -148,6 +129,28 @@ class PdoStudentRepository implements StudentRepository
         }
     }
 
+//    responsavel por inserir (somente iss) telefone
+    public function insertPhone(Students $student): bool
+    {
+        $pdo = $this->connection;
+        // Insere os telefones associados ao aluno na tabela phones
+        foreach ($student->getPhones() as $phone) {
+            $queryInsertPhone= $pdo->prepare('INSERT INTO phones (student_id, area_code, number )
+                                                             VALUES  (:student_id, :area_code, :number )');
+           $success =  $queryInsertPhone->execute([
+                ":student_id" => $student->getId(),
+                ":area_code" => $phone->getAreaCode(),
+                ":number" => $phone->getNumber()
+            ]);
+            if(!$success ) {
+                return false;
+            }
+
+            $phoneId = $pdo->lastInsertId();
+            $phone->defineId($phoneId);
+        }
+        return true;
+    }
     public function remove(Students $student): bool
     {
             $pdo = $this->connection;
