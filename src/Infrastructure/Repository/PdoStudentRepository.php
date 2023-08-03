@@ -31,20 +31,56 @@ class PdoStudentRepository implements StudentRepository
                                         $studentData["name"],
                                         new \DateTimeImmutable($studentData['birth_date'])
                                        );
-//                $this->fillPhoneOf($student);
                 $resultStudentList[] = $student;
             }
         }
-
         return $resultStudentList;
-
     }
+// ...
+    public function removeAll()
+    {
+        $pdo = $this->connection;
+        $queryDeleteStudent = $pdo->prepare('DELETE FROM phones');
+        return $queryDeleteStudent->execute();
+
+}
+    public function studentsWithPhone(): array
+    {
+        $pdo = $this->connection;
+        $queryStudentsWithPhone = $pdo->query('SELECT
+        students.id AS student_id,
+        students.name,
+        students.birth_date,
+        phones.id AS phone_id,
+        phones.area_code,
+        phones.number
+        FROM students
+        JOIN phones ON phones.student_id = students.id');
+
+        $result = $queryStudentsWithPhone->fetchAll(PDO::FETCH_ASSOC);
+        $studentList = [];
+
+        foreach ($result as $row) {
+            if (!array_key_exists($row['id'], $studentList)) {
+                $studentList[$row['id']] = new Students(
+                    $row['id'],
+                    $row["name"],
+                    new \DateTimeImmutable($row['birth_date'])
+                );
+            }
+//            $phoneStudent = new Phone();
+            $studentList[$row['id']]->setPhones($row['phone_id'], $row['area_code'], $row['number']);
+        }
+
+        return $studentList;
+    }
+// ...
+
     public function allStudent(): array
     {
         $queryAllStudents = $this->connection->query('SELECT * FROM students');
         return $this->hydrateStudentList($queryAllStudents);
     }
-
     public function studentsBirthAt(\DateTimeInterface $birth_date): array
     {
         $queryAllStudentsBirthAt = $this->connection->prepare('SELECT * FROM students WHERE birth_date = ?');
@@ -52,7 +88,6 @@ class PdoStudentRepository implements StudentRepository
 
         return $this->hydrateStudentList($queryAllStudentsBirthAt);
     }
-
     public function studentsById(Students $student): array
     {
         $pdo = $this->connection;
@@ -62,45 +97,16 @@ class PdoStudentRepository implements StudentRepository
         return $this->hydrateStudentList($queryStudentsById);
 
     }
-
-    public function studentsWithPhone(Students $student):array
-    {
-
-        $pdo = $this->connection;
-        $queryStudentsWithPhone = $pdo->query('SELECT   students.id,
-                                                            students.name,
-                                                            students.birth_date,
-                                                            phones.id AS phone_id ,
-                                                            phones.area_code,
-                                                            phones.number
-                                                   FROM students
-                                                   JOIN phones ON phones.id = students.id');
-       $result = $queryStudentsWithPhone->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($result as $row) {
-            $studentList = [];
-            if (!array_key_exists($row['id'], $studentList)){
-                $studentList[] = new Students(  $row['id'],
-                                                $row["name"],
-                                                new \DateTimeImmutable($row['birth_date'])
-                );
-            }
-            $phoneStudent = new Phone(null, "45", "1111111");
-            $studentList[$row['id']]->setPhones($phoneStudent);
-
-       }
-        return $studentList;
-    }
-   //metodo utilizado para salvar persistencia de novo cadastro
+    //metodo utilizado para salvar persistencia de novo cadastro
     public function save(Students $student): bool
     {
         //verifica se o aluno exise ou não (se id == null ainda n existe)
         if ($student->getId()===null){
-           return $this->insertStudent($student);
+           return $this->insertStudent($student) ;
         }
         return $this->update($student);
 
     }
-
     public function insertStudent(Students $student):bool
     {
         $pdo = $this->connection;
@@ -117,14 +123,26 @@ class PdoStudentRepository implements StudentRepository
             //nesse caso, o valor retornado está sendo usado para definir(set) o valor do id do objeto student criado;
             // verificação de q somente funcionará se execução da declaração for verdadeira
             if($success) {
-                $student->defineId($pdo->lastInsertId());
+                $studentId = $pdo->lastInsertId();
+                $student->defineId($studentId);
+                // Insere os telefones associados ao aluno na tabela phones
+                foreach ($student->getPhones() as $phone) {
+                    $queryInsertPhone= $pdo->prepare('INSERT INTO phones (student_id, area_code, number )
+                                                         VALUES  (:student_id, :area_code, :number )');
+                    $queryInsertPhone->execute([
+                        ":student_id" => $studentId,
+                        ":area_code" => $phone->getAreaCode(),
+                        ":number" => $phone->getNumber()
+                    ]);
+                    $phoneId = $pdo->lastInsertId();
+                    $phone->defineId($phoneId);
+                }
             }
             echo "O(A) estudante {$student->getName()} foi cadastrado(a)." . PHP_EOL;
             return $success;
         } catch (\PDOException $PDOException) {
             throw  new \Exception($PDOException->getMessage());
         }
-
     }
 
     public function remove(Students $student): bool

@@ -25,11 +25,14 @@ class Students
     }
 
     /**
-     * @param Phone $phones
+     * @param ?int $id
+     * @param string $area_code
+     * @param string $number
      * correspomde ao metodo addPhone
      */
-    public function setPhones(Phone $phone): void
+    public function setPhones(?int $id, $area_code, $number): void
     {
+        $phone = new Phone($id, $area_code, $number);
         $this->phones[] = $phone;
     }
 
@@ -41,6 +44,7 @@ class Students
     public function defineId(int $id):void
     {
         if (!is_null($this->id)){
+
             throw  new  \DomainException("Você só pode definir um ID por vez");
         }
         $this->id = $id;
