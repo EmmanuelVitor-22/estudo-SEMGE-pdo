@@ -2,8 +2,6 @@
 
 
 
-use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
-
 require 'vendor/autoload.php';
 
 //$pdo = new PDO('sqlite:' . $database);
@@ -16,7 +14,5 @@ require 'vendor/autoload.php';
 //}else{
 //    echo "não";
 //}
-$deleteRepository  = new PdoStudentRepository();
-$deleteRepository->remove(4);
 
 

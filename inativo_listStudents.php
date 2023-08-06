@@ -1,5 +1,6 @@
 <?php
     use Emmanuel\Domain\Model\Students;
+use Emmanuel\Infrastructure\Persistence\ConnectionCreator;
 use Emmanuel\Infrastructure\Repository\PdoStudentRepository;
 
 require 'vendor/autoload.php';
@@ -31,5 +32,9 @@ require 'vendor/autoload.php';
 
 
     //usando repositorio
-    $pdoRepositoryStudent =  new PdoStudentRepository();
-    print_r($pdoRepositoryStudent->allStudent());
+
+    $pdoRepositoryStudent =  new PdoStudentRepository(ConnectionCreator::createConnection());
+    print_r(  $pdoRepositoryStudent->allStudent());
+//    print_r($pdoRepositoryStudent->studentsWithPhone());
+
+
